@@ -13,9 +13,14 @@ data Doc = Doc {
                  docValue :: Maybe String
                } deriving Show
 
-level :: Parser Int
-level = read <$> some digit
+data Elem = Elem {
+                   elemTag :: String,
+                   elemID :: Maybe String,
+                   elemValue :: Maybe String,
+                   elemChildren :: [Elem]
+                  } deriving Show
 
+type GEDCOM = [Elem]
 
 idd :: Parser String
 idd = do
@@ -34,9 +39,9 @@ toMaybe :: String -> Maybe String
 toMaybe [] = Nothing
 toMaybe xs = Just xs
 
---docParser :: Parser Doc
-docParser = do
-  l <- level
+docParser :: Int -> Parser Doc
+docParser lev = do
+  string (show lev)
   spaces
   id <- idd <|>  optSpaces
   optSpaces
@@ -44,9 +49,18 @@ docParser = do
   optSpaces
   val <- value
   optNewLine
-  return (Doc l (toMaybe id) t (toMaybe val))
+  return (Doc lev (toMaybe id) t (toMaybe val))
   
-  
+elemParser :: Int -> Parser Elem
+elemParser lev = do
+    doc <- docParser lev
+    case doc of
+        Doc dl di dt dv -> do
+          children <- many (elemParser $ lev + 1)
+          return $ Elem dt di dv children
+
+document :: Parser GEDCOM
+document = many $ elemParser 0
 
 printContents s = putStrLn s
     
@@ -58,4 +72,6 @@ main = do
   else do
        let fileName =  args !! 0
        cont <- readFile fileName
-       printContents cont
+       case parse document cont of
+         [] -> putStrLn "Nothing parsed"
+         [(gc, _)] -> putStrLn (show gc)
