@@ -96,10 +96,20 @@ string (c:cs) = do
   return (c:cs)
 
 spaces :: Parser String
-spaces = many $ oneOf " \n\r"
+spaces = some $ oneOf " \t"
+
+optSpaces :: Parser String
+optSpaces = many $ oneOf " \t"
+
+newLine :: Parser String
+newLine = some $ oneOf "\n\r"
+
+optNewLine :: Parser String
+optNewLine = many $ oneOf "\n\r"
 
 alphaNum :: Parser String
-alphaNum = many $ satisfy isAlphaNum
+alphaNum = some $ satisfy isAlphaNum
 
 alpha :: Parser String
-alpha = many $ satisfy isAlpha
+alpha = some $ satisfy isAlpha
+
