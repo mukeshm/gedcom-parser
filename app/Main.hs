@@ -59,7 +59,7 @@ elemParser lev = do
   return $ Elem dt di dv children
 
 document :: Parser GEDCOM
-document = many $ elemParser 0
+document = some $ elemParser 0
 
 lower :: String -> String
 lower = map toLower
