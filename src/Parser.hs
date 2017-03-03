@@ -6,13 +6,6 @@ import Control.Applicative
 
 newtype Parser a = Parser { parse :: String -> [(a, String)]}
 
-runParser :: Parser a -> String -> a
-runParser p s =
-  case parse p s of
-    [(res, [])] -> res
-    [(_, rs)]   -> error "Parser did not consume entire stream"
-    _           -> error "Parser error"
-
 item :: Parser Char
 item = Parser $ \s ->
   case s of
