@@ -49,20 +49,6 @@ instance Alternative Parser where
   empty = mzero
   (<|>) = option
 
--- | One or more.
--- some :: f a -> f [a]
--- some v = some_v
---   where
---     many_v = some_v <|> pure []
---     some_v = (:) <$> v <*> many_v
-
--- | Zero or more.
--- many :: f a -> f [a]
--- many v = many_v
---   where
---     many_v = some_v <|> pure []
---     some_v = (:) <$> v <*> many_v
-
 satisfy :: (Char -> Bool) -> Parser Char
 satisfy p = item >>= \c ->
   if p c

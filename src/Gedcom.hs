@@ -27,11 +27,23 @@ idd = do
   char '@'
   return id
 
+optID :: Parser String
+optID = do
+    i <- idd
+    spaces
+    return i
+
 tag :: Parser String
 tag = some $ satisfy isUpper
 
 value :: Parser String
-value = many $ satisfy isPrint
+value = some $ satisfy isPrint
+
+optValue :: Parser String
+optValue = do
+  spaces
+  value
+  
 
 toMaybe :: String -> Maybe String
 toMaybe [] = Nothing
@@ -41,12 +53,11 @@ docParser :: Int -> Parser Doc
 docParser lev = do
   string (show lev)
   spaces
-  id <- idd <|>  optSpaces
-  optSpaces
+  id <- optID <|> return []
   t <- tag
+  val <- optValue <|> return []
   optSpaces
-  val <- value
-  optNewLine
+  newLine
   return (Doc lev (toMaybe id) t (toMaybe val))
   
 elemParser :: Int -> Parser Elem

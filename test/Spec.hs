@@ -81,11 +81,11 @@ main = hspec $ do
 
     describe "Document parser" $ do
       it "0 @I1@ INDI should parse to level 0" $ do
-        fmap docLevel (runParser (docParser 0) "0 @I1@ INDI") `shouldBe` (Just 0)
+        fmap docLevel (runParser (docParser 0) "0 @I1@ INDI\n") `shouldBe` (Just 0)
       it "0 @I1@ INDI should parse to id I1" $ do
-        fmap docID (runParser (docParser 0) "0 @I1@ INDI") `shouldBe` (Just (Just "I1"))
+        fmap docID (runParser (docParser 0) "0 @I1@ INDI\n") `shouldBe` (Just (Just "I1"))
       it "0 @I1@ INDI should parse to tag INDI" $ do
-        fmap docTag (runParser (docParser 0) "0 @I1@ INDI") `shouldBe` (Just "INDI")
+        fmap docTag (runParser (docParser 0) "0 @I1@ INDI\n") `shouldBe` (Just "INDI")
 
     describe "getIDattrib" $ do
       it "should give empty string for Nothing " $ do
