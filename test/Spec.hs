@@ -13,6 +13,53 @@ runParser m s =
 
 main :: IO ()
 main = hspec $ do
+
+  describe "Parser combinators" $ do
+
+    describe "Item parser" $ do
+      it "Should consume first character" $ do
+        let [(c, cs)] = parse item "test"
+        c `shouldBe` 't'
+      it "Should give empty for empty string" $ do
+        parse item "" `shouldBe` []
+
+    describe "Monadic bind" $ do
+      it "should extract the value from first parser and give it to next" $ do
+        let [(c, cs)] = parse (item `bind` (\c -> do {item; return c})) "test"
+        c `shouldBe` 't'
+      it "Should be able to compose parsers" $ do
+        let [(c, cs)] = parse (item >> item >> item >> item >> item) "tessel"
+        c `shouldBe` 'e'
+
+    describe "Monadic return" $ do
+      it "should wrap a char into parser context" $ do
+        let [(c, cs)] = parse (unit 'a') "test"
+        c `shouldBe` 'a'
+        cs `shouldBe` "test"
+
+    describe "Failure parser" $ do
+      it "Should always fail" $ do
+       parse (failure :: Parser Int) "test" `shouldBe` []
+
+    describe "option parser" $ do
+      it "Should use first parser if first parser succedes" $ do
+       let [(c, cs)] =  parse (item `option` failure) "test"
+       c `shouldBe` 't'
+       cs `shouldBe` "est"
+      it "Should use second parser if first parser fails" $ do
+       let [(c, cs)] =  parse (failure `option` item) "test"
+       c `shouldBe` 't'
+       cs `shouldBe` "est"
+      it "Should fail if both first and second parser fails" $ do
+       parse ((failure `option` failure) :: Parser Int) "test" `shouldBe` []
+
+    describe "satisfy parser" $ do
+      it "Should only parse @ for input \"@\"" $ do
+       runParser (satisfy ('@' ==)) "@" `shouldBe` (Just '@')
+      it "Should fail to parse @ for input \"t\"" $ do
+       runParser (satisfy ('@' ==)) "t" `shouldBe` Nothing
+
+  
   describe "Gedcom parser" $ do
     describe "ID parser" $ do
       it "@1234@ is valid id" $ do
@@ -41,20 +88,13 @@ main = hspec $ do
         fmap docTag (runParser (docParser 0) "0 @I1@ INDI") `shouldBe` (Just "INDI")
 
     describe "getIDattrib" $ do
-        it "Nothing should give empty string" $ do
-          getIDattrib Nothing `shouldBe` []
-        it "Just \"I0001\" should give id value" $ do
-          getIDattrib (Just "I0001") `shouldBe` " id=\"@I0001@\""
+      it "should give empty string for Nothing " $ do
+        getIDattrib Nothing `shouldBe` []
+      it "should give id value for Just \"I0001\" " $ do
+        getIDattrib (Just "I0001") `shouldBe` " id=\"@I0001@\""
 
     describe "getIDattrib" $ do
-        it "Nothing should give empty string" $ do
-          getIDattrib Nothing `shouldBe` []
-        it "Just \"I0001\" should give id value" $ do
-          getIDattrib (Just "I0001") `shouldBe` " id=\"@I0001@\""
-
-
-  describe "Parser combinators" $ do
-
-    describe "Parser combinators" $ do
-      it "Something happening" $ do
-        True `shouldBe` True
+      it "should give empty string for Nothing " $ do
+        getIDattrib Nothing `shouldBe` []
+      it "should give id value for Just \"I0001\"" $ do
+        getIDattrib (Just "I0001") `shouldBe` " id=\"@I0001@\""
