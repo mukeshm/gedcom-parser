@@ -35,10 +35,8 @@ $ stack test
 Executing the gedcom-parser using stack:
 
 ```bash
-$ stack exec gedcom-parser input_file.txt
+$ stack exec gedcom-parser input_file.txt 
 ```
-
- 
 
 #### Example:
 
@@ -53,3 +51,16 @@ To save the output to file use shel redirect operators to save output to file.
 ```bash
 $ stack exec gedcom-parser gedcom-input.txt > gedcom-output.xml	
 ```
+
+#### Directories and Files:
+
+- **src** - Contains all modules written as libraries
+  - **Parser.hs** - The core parser combinator
+  - **Gedcom.hs** - The GEDCOM format specific parsers and xml kind of file generator
+- **app** - The main application with main function goes into this directory
+  - **Main.hs** - The file containing haskell main function
+- **test** - All test related file goes into this directory
+  - **Spec.hs** - The main file containing all the tests
+- **stack.yaml** - The project stack configuration file
+- **gedcom-parser.cabal** - The project cabal configuration file
+
